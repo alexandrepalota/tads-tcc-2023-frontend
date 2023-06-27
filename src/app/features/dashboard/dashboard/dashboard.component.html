@@ -1,0 +1,82 @@
+<div class="container">
+  <div class="grid">
+
+    <div class="col-12">
+      <h1>Dashboard</h1>
+    </div>
+
+    <div class="col-12">
+      <p-tabView>
+
+        <p-tabPanel header="Painel sinalizador">
+          <p-table styleClass="p-datatable-sm p-datatable-gridlines" [value]="equipmentsSituation" [paginator]="true"
+            [lazy]="true" [totalRecords]="equipmentsSituationTotalElements"
+            (onLazyLoad)="onChangeEquipmentsSituationPage($event)" [rows]="10" responsiveLayout='stack'
+            [breakpoint]="'960px'" [tableStyle]="{ 'min-width': '1rem' }" #table>
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Equipamento</th>
+                <th>Planta</th>
+                <th>Inspeções</th>
+                <th>Calibrações</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-equipment>
+              <tr>
+                <td><a routerLink="/">{{equipment.tag}}</a></td>
+                <td>{{equipment.plant}}</td>
+                <td>
+                  <p-tag [style]="{width: '60%'}"
+                    *ngIf="!equipment.expiredInspections && !equipment.nextToExpireInspections" icon="pi pi-check"
+                    [rounded]="true" severity="success" value="Em dia"></p-tag>
+                  <p-tag [style]="{width: '60%'}" *ngIf="equipment.expiredInspections" icon="pi pi-times"
+                    [rounded]="true" severity="danger" value="Atrasado"></p-tag>
+                  <p-tag [style]="{width: '60%'}"
+                    *ngIf="!equipment.expiredInspections && equipment.nextToExpireInspections" icon="pi pi-exclamation"
+                    [rounded]="true" severity="warning" value="Vencendo"></p-tag>
+                </td>
+                <td>
+                  <p-tag [style]="{width: '60%'}"
+                    *ngIf="!equipment.expiredCalibrations && !equipment.nextToExpireCalibrations" icon="pi pi-check"
+                    [rounded]="true" severity="success" value="Em dia"></p-tag>
+                  <p-tag [style]="{width: '60%'}" *ngIf="equipment.expiredCalibrations" icon="pi pi-times"
+                    [rounded]="true" severity="danger" value="Atrasado"></p-tag>
+                  <p-tag [style]="{width: '60%'}"
+                    *ngIf="!equipment.expiredCalibrations && equipment.nextToExpireCalibrations"
+                    icon="pi pi-exclamation" [rounded]="true" severity="warning" value="Vencendo"></p-tag>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-tabPanel>
+
+        <p-tabPanel header="Pendências de inspeção">
+          <div class="grid">
+            <div class="col-12 md:col-6">
+              <p-panel header="Pendências por Planta">
+                <p-chart type="doughnut" [data]="pendenciesByPlant" [options]="pendenciesByPlantOptions"
+                  height="40vh"></p-chart>
+              </p-panel>
+            </div>
+            <div class="col-12 md:col-6">
+              <p-panel header="Pendências por Responsável">
+                <p-chart type="doughnut" [data]="pendenciesByResponsible" [options]="pendenciesByResponsibleOptions"
+                  height="40vh"></p-chart>
+              </p-panel>
+            </div>
+
+          </div>
+        </p-tabPanel>
+
+        <p-tabPanel header="Projeção de gastos">
+          <div class="col-12">
+            <p-panel header="Projeção de gastos por Planta">
+              <p-chart type="bar" [data]="costForecast" [options]="costForecastOptions" height="40vh"></p-chart>
+            </p-panel>
+          </div>
+        </p-tabPanel>
+      </p-tabView>
+    </div>
+
+  </div>
+</div>

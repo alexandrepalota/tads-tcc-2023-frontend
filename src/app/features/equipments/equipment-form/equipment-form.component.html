@@ -1,0 +1,549 @@
+<div class="container">
+
+  <div class="grid">
+    <div class="col-12">
+      <h1>{{ !auth.hasPermission('EQUIPMENT_WRITE') ? 'Detalhe' : updating ? 'Atualização' : 'Cadastro'}} de
+        Equipamento</h1>
+    </div>
+  </div>
+
+  <form #f="ngForm" (submit)="save(f)">
+    <p-tabView>
+
+      <p-tabPanel header="Equipamento">
+
+        <div class="grid">
+          <div class="col-12">
+            <h3>Dados gerais</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Tag</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="TAG"
+              [(ngModel)]="equipment.tag" ngModel #tag="ngModel" [required]="true" [minlength]="2" [maxlength]="20">
+            <app-message [control]="tag.control" error="required" text="Campo obrigatório"></app-message>
+            <app-message [control]="tag.control" error="minlength"
+              text="Mínimo {{tag.errors?.['minlength']?.requiredLength}} caracteres"></app-message>
+            <app-message [control]="tag.control" error="maxlength"
+              text="Mínimo {{tag.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-4 p-fluid">
+            <label>Nome</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="name"
+              [(ngModel)]="equipment.name" ngModel #name="ngModel" [required]="true" [minlength]="2" [maxlength]="40">
+            <app-message [control]="name.control" error="required" text="Campo obrigatório"></app-message>
+            <app-message [control]="name.control" error="minlength"
+              text="Mínimo {{name.errors?.['minlength']?.requiredLength}} caracteres"></app-message>
+            <app-message [control]="name.control" error="maxlength"
+              text="Mínimo {{name.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div *ngIf="equipment.id" class="col-12 md:col-2 p-fluid">
+            <label>Categoria</label>
+            <input [readOnly]="true" disabled pInputText type="text" name="category" value="{{equipment.category}}">
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Área</label>
+            <p-autoComplete [readonly]="!auth.hasPermission('EQUIPMENT_WRITE')" [required]="true" name="area"
+              [(ngModel)]="equipment.area" [suggestions]="areas" [forceSelection]="true" [required]="true"
+              (completeMethod)="loadAreaList($event.query)" field="code"></p-autoComplete>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="col-12">
+            <h3>Dados de operação</h3>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Pressão de T.H (kgf/cm²)</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="number"
+              name="hydrostaticTestPressure" [(ngModel)]="equipment.hydrostaticTestPressure" ngModel
+              #hydrostaticTestPressure="ngModel" [min]="0">
+            <app-message [control]="hydrostaticTestPressure.control" error="min" text="Valor mínimo é 0"></app-message>
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Pressão de Operação (kgf/cm²)</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="number"
+              name="maxOperationPressure" [(ngModel)]="equipment.maxOperationPressure" ngModel
+              #maxOperationPressure="ngModel">
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>P.M.T.A. (kgf/cm²)</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="number"
+              name="maxAllowedWorkPressure" [(ngModel)]="equipment.maxAllowedWorkPressure" ngModel
+              #maxAllowedWorkPressure="ngModel">
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Classe de fluído</label>
+            <p-dropdown [options]="fluidClasses" name="fluidClass" [(ngModel)]="equipment.fluidClass"
+              optionLabel="description" optionValue="code">
+            </p-dropdown>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="col-12">
+            <h3>Dados de fabricação</h3>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="col-12 md:col-4 p-fluid">
+            <label>Fabricante</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="manufacturer"
+              [(ngModel)]="equipment.manufacturer" ngModel #manufacturer="ngModel" [maxlength]="40">
+            <app-message [control]="manufacturer.control" error="maxlength"
+              text="Máximo {{manufacturer.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Modelo</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="model"
+              [(ngModel)]="equipment.model" ngModel #model="ngModel" [maxlength]="20">
+            <app-message [control]="model.control" error="maxlength"
+              text="Máximo {{model.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Nº de série</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="serialNumber"
+              [(ngModel)]="equipment.serialNumber" ngModel #serialNumber="ngModel" [maxlength]="20">
+            <app-message [control]="serialNumber.control" error="maxlength"
+              text="Máximo {{serialNumber.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-2 p-fluid">
+            <label>Ano de fabricação</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="manufactureYear"
+              [(ngModel)]="equipment.manufactureYear" ngModel #manufactureYear="ngModel" [maxlength]="4">
+            <app-message [control]="manufactureYear.control" error="maxlength"
+              text="Máximo {{manufactureYear.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Código de projeto</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text" name="projectCode"
+              [(ngModel)]="equipment.projectCode" ngModel #projectCode="ngModel" [maxlength]="40">
+            <app-message [control]="projectCode.control" error="maxlength"
+              text="Máximo {{projectCode.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-2 p-fluid">
+            <label>Ano de Edição</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="text"
+              name="projectCodeEditionYear" [(ngModel)]="equipment.projectCodeEditionYear" ngModel
+              #projectCodeEditionYear="ngModel" [maxlength]="4">
+            <app-message [control]="projectCodeEditionYear.control" error="maxlength"
+              text="Máximo {{projectCodeEditionYear.errors?.['maxlength']?.requiredLength}} caracteres"></app-message>
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Diâmetro (mm)</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="number" name="diameter"
+              [(ngModel)]="equipment.diameter" ngModel #diameter="ngModel">
+          </div>
+          <div class="col-12 md:col-3 p-fluid">
+            <label>Volume (m³)</label>
+            <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="number" name="volume"
+              [(ngModel)]="equipment.volume" ngModel #volume="ngModel">
+          </div>
+        </div>
+
+      </p-tabPanel>
+
+      <p-tabPanel header="Instalação">
+
+        <div class="grid">
+          <div class="col-12">
+            <h3>Instalação</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-4">
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui duas saídas amplas</label>
+              <p-inputSwitch name="hasTwoWideExits" [(ngModel)]="equipment.hasTwoWideExits"></p-inputSwitch>
+            </div>
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui ventilação</label>
+              <p-inputSwitch name="hasVentilation" [(ngModel)]="equipment.hasVentilation"></p-inputSwitch>
+            </div>
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui acesso para manutenção</label>
+              <p-inputSwitch name="hasMaintenanceAccess" [(ngModel)]="equipment.hasMaintenanceAccess"></p-inputSwitch>
+            </div>
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui iluminação local</label>
+              <p-inputSwitch name="hasLocalLighting" [(ngModel)]="equipment.hasLocalLighting"></p-inputSwitch>
+            </div>
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui iluminação de emergência</label>
+              <p-inputSwitch name="hasEmergencyLighting" [(ngModel)]="equipment.hasEmergencyLighting"></p-inputSwitch>
+            </div>
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui placa de identificação</label>
+              <p-inputSwitch name="hasIdentificationTag" [(ngModel)]="equipment.hasIdentificationTag"></p-inputSwitch>
+            </div>
+            <div class="col-12 flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui placa de categoria</label>
+              <p-inputSwitch name="hasCategoryTag" [(ngModel)]="equipment.hasCategoryTag"></p-inputSwitch>
+            </div>
+          </div>
+        </div>
+
+      </p-tabPanel>
+
+      <p-tabPanel *ngIf="updating" header="Documentação">
+
+        <div class="grid">
+          <div class="col-12">
+            <h3>Documentação</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12">
+
+            <p-divider></p-divider>
+
+            <div class="flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui prontuário</label>
+              <div class="flex flex-row align-items-center justify-content-end">
+                <p-inputSwitch class="mr-2" name="hasDatabook" [(ngModel)]="equipment.hasDatabook"></p-inputSwitch>
+                <p-fileUpload *ngIf="!equipment?.databookFile?.id" [style]="{'width':'100%'}" name="file"
+                  mode="basic" [auto]="true" [maxFileSize]="2097152" chooseLabel="Anexar PDF" accept="application/pdf"
+                  [headers]="uploadHeaders" method="put" [url]="urlUploadDatabook"
+                  (onUpload)="afterUpload()"></p-fileUpload>
+                <p-button *ngIf="equipment?.databookFile?.id" label="Baixar PDF" icon="pi pi-download"
+                  styleClass="p-button-secondary mr-1" (onClick)="downloadDatabook()"></p-button>
+                <p-button *ngIf="equipment?.databookFile?.id" label="Excluir PDF" icon="pi pi-trash"
+                  styleClass="p-button-danger" (onClick)="deleteDatabook()"></p-button>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+
+            <div class="flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui projeto de instalação</label>
+              <div class="flex flex-row align-items-center justify-content-end">
+                <p-inputSwitch class="mr-2" name="hasInstallationProject"
+                  [(ngModel)]="equipment.hasInstallationProject"></p-inputSwitch>
+                <p-fileUpload *ngIf="!equipment?.installationProjectFile?.id" [style]="{'width':'100%'}"
+                  name="file" mode="basic" [auto]="true" [maxFileSize]="2097152"
+                  chooseLabel="Anexar PDF" accept="application/pdf" [headers]="uploadHeaders" method="put"
+                  [url]="urlUploadInstallationProject" (onUpload)="afterUpload()"></p-fileUpload>
+                <p-button *ngIf="equipment?.installationProjectFile?.id" label="Baixar PDF" icon="pi pi-download"
+                  styleClass="p-button-secondary mr-1" (onClick)="downloadInstallationProject()"></p-button>
+                <p-button *ngIf="equipment?.installationProjectFile?.id" label="Excluir PDF" icon="pi pi-trash"
+                  styleClass="p-button-danger" (onClick)="deleteInstallationProject()"></p-button>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+
+            <div class="flex flex-row align-items-center justify-content-between">
+              <label class="mr-2 mb-1">Possui registro de segurança</label>
+              <div class="flex flex-row align-items-center justify-content-end">
+                <p-inputSwitch class="mr-2" name="hasSafetyJournal"
+                  [(ngModel)]="equipment.hasSafetyJournal"></p-inputSwitch>
+                <p-fileUpload *ngIf="!equipment?.safetyJournalFile?.id" [style]="{'width':'100%'}"
+                  name="file" mode="basic" [auto]="true" [maxFileSize]="2097152" chooseLabel="Anexar PDF"
+                  accept="application/pdf" [headers]="uploadHeaders" method="put" [url]="urlUploadSafetyJournal"
+                  (onUpload)="afterUpload()"></p-fileUpload>
+                <p-button *ngIf="equipment?.safetyJournalFile?.id" label="Baixar PDF" icon="pi pi-download"
+                  styleClass="p-button-secondary mr-1" (onClick)="downloadSafetyJournal()"></p-button>
+                <p-button *ngIf="equipment?.safetyJournalFile?.id" label="Excluir PDF" icon="pi pi-trash"
+                  styleClass="p-button-danger" (onClick)="deleteSafetyJournal()"></p-button>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+
+          </div>
+        </div>
+
+      </p-tabPanel>
+
+      <p-tabPanel *ngIf="updating" header="Indicadores de pressão">
+
+        <div class="grid">
+          <div class="col-12">
+            <h3>Indicadores de pressão</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col">
+            <p-panel header="Indicadores de pressão instalados no equipamento">
+              <p-button (click)="pressureIndicatorDialogVisible = true" styleClass="mb-2 p-button-secondary"
+                type="button" label="Adicionar"></p-button>
+              <p-table styleClass="p-datatable-sm p-datatable-gridlines" [value]="equipment.pressureIndicators"
+                responsiveLayout='stack' [breakpoint]="'960px'" [tableStyle]="{ 'min-width': '1rem' }" #table>
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Tag</th>
+                    <th>Descrição</th>
+                    <th>Última calibração</th>
+                    <th class="col-actions-header">Ação</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-pi>
+                  <tr>
+                    <td>
+                      <span class="p-column-title">Id</span>
+                      {{ pi.tag }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Tag</span>
+                      {{ pi.description }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Nome</span>
+                      {{ pi.lastCalibration }}
+                    </td>
+                    <td class="col-actions">
+                      <button type="button" *ngIf="auth.hasPermission('EQUIPMENT_WRITE')" pButton
+                        (click)="onUnbindPressureIndicator(pi.id)" icon="pi pi-trash" pTooltip="Desinstalar"
+                        tooltipPosition="top"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </p-panel>
+
+          </div>
+        </div>
+
+      </p-tabPanel>
+
+      <p-tabPanel *ngIf="updating" header="Válvulas de segurança">
+
+        <div class="grid">
+          <div class="col-12">
+            <h3>Válvulas de segurança</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col">
+            <p-panel header="Válvulas de segurança instaladas no equipamento">
+              <p-button (click)="pressureSafetyValveDialogVisible = true" styleClass="mb-2 p-button-secondary"
+                type="button" label="Adicionar"></p-button>
+              <p-table styleClass="p-datatable-sm p-datatable-gridlines" [value]="equipment.pressureSafetyValves"
+                responsiveLayout='stack' [breakpoint]="'960px'" [tableStyle]="{ 'min-width': '1rem' }" #table>
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Tag</th>
+                    <th>Descrição</th>
+                    <th>Última calibração</th>
+                    <th class="col-actions-header">Ação</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-psv>
+                  <tr>
+                    <td>
+                      <span class="p-column-title">Id</span>
+                      {{ psv.tag }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Tag</span>
+                      {{ psv.description }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Nome</span>
+                      {{ psv.lastCalibration }}
+                    </td>
+                    <td class="col-actions">
+                      <button type="button" *ngIf="auth.hasPermission('EQUIPMENT_WRITE')" pButton
+                        (click)="onUnbindPressureSafetyValve(psv.id)" icon="pi pi-trash" pTooltip="Desinstalar"
+                        tooltipPosition="top"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </p-panel>
+          </div>
+        </div>
+
+      </p-tabPanel>
+
+      <p-tabPanel *ngIf="updating" header="Ensaios aplicáveis">
+
+        <div class="grid">
+          <div class="col-12">
+            <h3>Ensaios aplicáveis</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col">
+            <p-panel header="Ensaios aplicáveis ao equipamento">
+              <p-button (click)="applicableTestDialogVisible = true" styleClass="mb-2 p-button-secondary" type="button"
+                label="Adicionar"></p-button>
+              <p-table styleClass="p-datatable-sm p-datatable-gridlines" [value]="equipment.applicableTests"
+                responsiveLayout='stack' [breakpoint]="'960px'" [tableStyle]="{ 'min-width': '1rem' }" #table>
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Nome</th>
+                    <th class="col-values-header">Frequência</th>
+                    <th class="col-dates-header">Última execução</th>
+                    <th class="col-dates-header">Próxima execução</th>
+                    <th class="col-actions-header">Ação</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-test>
+                  <tr [ngClass]="{'inactive-text': !test.active}">
+                    <td>
+                      <span class="p-column-title">Nome</span>
+                      {{ test.name }}
+                    </td>
+                    <td>
+                      <span class="p-column-title">Frequência</span>
+                      {{ frequencyToText(test.frequency, test.frequencyType) }}
+                    </td>
+                    <td class="col-dates">
+                      <span class="p-column-title">Última execução</span>
+                      {{ test.lastTestDate | date: 'dd/MM/yyyy' }}
+                    </td>
+                    <td class="col-dates">
+                      <span class="p-column-title">Próxima execução</span>
+                      {{ test.nextTestDate | date: 'dd/MM/yyyy' }}
+                    </td>
+                    <td class="col-actions">
+                      <button class="mr-2" type="button" *ngIf="auth.hasPermission('EQUIPMENT_WRITE')" pButton
+                        (click)="onOpenApplicableTestDialog(test.testId)" icon="pi pi-pencil" pTooltip="Editar"
+                        tooltipPosition="top"></button>
+                      <button type="button" *ngIf="auth.hasPermission('EQUIPMENT_WRITE') && test.active" pButton
+                        (click)="inactivateApplicableTest(test.testId)" icon="pi pi-trash" pTooltip="Desativar"
+                        tooltipPosition="top"></button>
+                      <button type="button" *ngIf="auth.hasPermission('EQUIPMENT_WRITE') && !test.active" pButton
+                        (click)="activateApplicableTest(test.testId)" icon="pi pi-refresh" pTooltip="Reativar"
+                        tooltipPosition="top"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </p-panel>
+          </div>
+        </div>
+
+      </p-tabPanel>
+
+    </p-tabView>
+
+    <p-divider></p-divider>
+
+    <div class="grid">
+      <div class="col-12 flex align-items-center justify-content-start mt-4">
+        <button *ngIf="auth.hasPermission('EQUIPMENT_WRITE')" [disabled]="!f.valid" pButton
+          type="submit">Salvar</button>
+        <button *ngIf="auth.hasPermission('EQUIPMENT_WRITE')" (click)="newEquipment(f)" class="p-button-info ml-1"
+          pButton type="button">Novo</button>
+        <a class="ml-1" routerLink="/equipments">Voltar para a listagem</a>
+      </div>
+    </div>
+  </form>
+
+  <p-dialog header="Novo indicador de pressão" [(visible)]="pressureIndicatorDialogVisible" [modal]="true"
+    [style]="{width: '70vw'}">
+    <div class="grid">
+      <div class="col-12 md:col-6 p-fluid">
+        <label>Indicador de pressão</label>
+        <p-dropdown [options]="availablePressureIndicators" [placeholder]="'Selecione um dispositivo'"
+          (onChange)="setPressureIndicatorToBind($event.value)" optionLabel="tag" optionValue="id">
+        </p-dropdown>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <p-divider></p-divider>
+        <div class="flex flex-row justify-content-between">
+          <label>Última calibração</label>
+          <span>{{pressureIndicatorToBind.lastCalibration ? (pressureIndicatorToBind.lastCalibration | date:
+            'dd/MM/yyyy') : '-'}}</span>
+        </div>
+        <p-divider></p-divider>
+        <div class="flex flex-row justify-content-between">
+          <label>Escala mínima</label>
+          <span>{{ pressureIndicatorToBind.minGauge ? (pressureIndicatorToBind.minGauge + ' kgf/cm²') : '-' }}</span>
+        </div>
+        <p-divider></p-divider>
+        <div class="flex flex-row justify-content-between">
+          <label>Escala máxima</label>
+          <span>{{ pressureIndicatorToBind.maxGauge ? (pressureIndicatorToBind.maxGauge + ' kgf/cm²') : '-' }}</span>
+        </div>
+        <p-divider></p-divider>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-12">
+        <button type="button" pButton (click)="onBindPressureIndicator()">Instalar</button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog header="Nova válvula de segurança" [(visible)]="pressureSafetyValveDialogVisible" [modal]="true"
+    [style]="{width: '70vw'}">
+    <div class="grid">
+      <div class="col-12 md:col-6 p-fluid">
+        <label>Válvula de segurança</label>
+        <p-dropdown [options]="availablePressureSafetyValves" [placeholder]="'Selecione um dispositivo'"
+          (onChange)="setPressureSafetyValveToBind($event.value)" optionLabel="tag" optionValue="id">
+        </p-dropdown>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <p-divider></p-divider>
+        <div class="flex flex-row justify-content-between">
+          <label>Última calibração</label>
+          <span>{{pressureSafetyValveToBind.lastCalibration ? (pressureSafetyValveToBind.lastCalibration | date:
+            'dd/MM/yyyy') : '-'}}</span>
+        </div>
+        <p-divider></p-divider>
+        <div class="flex flex-row justify-content-between">
+          <label>Pressão de abertura</label>
+          <span>{{ pressureSafetyValveToBind.openingPressure ? (pressureSafetyValveToBind.openingPressure + ' kgf/cm²')
+            : '-' }}</span>
+        </div>
+        <p-divider></p-divider>
+        <div class="flex flex-row justify-content-between">
+          <label>Pressão de fechamento</label>
+          <span>{{ pressureSafetyValveToBind.closingPressure ? (pressureSafetyValveToBind.closingPressure + ' kgf/cm²')
+            : '-' }}</span>
+        </div>
+        <p-divider></p-divider>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-12">
+        <button type="button" pButton (click)="onBindPressureSafetyValve()">Instalar</button>
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog header="Nova teste aplicável" [(visible)]="applicableTestDialogVisible" [modal]="true"
+    [style]="{width: '70vw', height: '40vh'}">
+    <div class="grid">
+      <div class="col-12 md:col-4 p-fluid">
+        <label>Teste</label>
+        <p-dropdown [(ngModel)]="applicableTestToAdd.test.id" name="test" [options]="tests"
+          [placeholder]="'Selecione um teste'" (onChange)="onSelectTestToApply($event.value)" optionLabel="name"
+          optionValue="id">
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-4 p-fluid">
+        <label>Tipo de frequência</label>
+        <p-dropdown [options]="frequencyTypes" optionLabel="label" optionValue="value" name="frequencyType"
+          [(ngModel)]="applicableTestToAdd.frequencyType">
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-4 p-fluid">
+        <label>Frequência</label>
+        <input [readOnly]="!auth.hasPermission('EQUIPMENT_WRITE')" pInputText type="number" step="1" name="frequency"
+          [(ngModel)]="applicableTestToAdd.frequency" [required]="true" [min]="1">
+      </div>
+    </div>
+    <div class="grid">
+      <div class="col-12">
+        <button type="button" pButton (click)="onAddApplicableTest()">Salvar</button>
+      </div>
+    </div>
+  </p-dialog>
+
+</div>
